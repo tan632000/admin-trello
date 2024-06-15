@@ -9,7 +9,6 @@ const TaskManagement = () => {
     const [tasks, setTasks] = useState([]);
     const [users, setUsers] = useState([]);
     const [show, setShow] = useState(false);
-    const [sprints, setSprints] = useState([]);
     const [currentTask, setCurrentTask] = useState({});
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -17,8 +16,6 @@ const TaskManagement = () => {
     useEffect(() => {
         axios.get('http://localhost:8080/tasks').then(response => {
             setTasks(response.data);
-            const uniqueSprints = [...new Set(response.data.map(task => task.sprint))];
-            setSprints(uniqueSprints);
         })
             .catch(error => {
                 console.error('There was an error fetching the user list!', error);
@@ -35,29 +32,23 @@ const TaskManagement = () => {
     }, []);
 
     const handleShow = (task) => {
-        console.log('====================================');
-        console.log("task === ", task);
-        console.log('====================================');
         setCurrentTask(task);
         setShow(true);
     };
 
-    const getUserByName = (userName) => {
-        const user = users.find(u => u.userName === userName);
-        return user ? user.id : null;
+    const getUserByName = (userId) => {
+        const user = users.find(u => u.userId === userId);
+        return user ? user.userName : null;
     };
 
     const handleClose = () => setShow(false);
 
     const handleSave = () => {
-        const userId = getUserByName(currentTask.assign_to);
-        console.log('====================================');
-        console.log(currentTask);
-        console.log('====================================');
+        const userName = getUserByName(currentTask.assignTo);
         if (currentTask.id) {
             axios.put(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
-                    assign_name: currentTask.assignName,
+                    assign_name: userName,
                     assign_to: currentTask.assignTo,
                     sprint: currentTask.sprint,
                     task_type: currentTask.task_type,
@@ -78,7 +69,7 @@ const TaskManagement = () => {
             axios.post(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
                     assign_name: currentTask.assign_to,
-                    assign_to: userId,
+                    assign_to: currentTask.assignTo,
                     sprint: currentTask.sprint,
                     task_type: currentTask.task_type,
                     priority: currentTask.priority,
@@ -105,11 +96,13 @@ const TaskManagement = () => {
     };
 
     const handleChange = (e) => {
-        console.log('====================================');
-        console.log('e.target.name == ', e.target.name);
-        console.log('====================================');
-        console.log('e.target.value == ', e.target.value);
-        setCurrentTask({ ...currentTask, [e.target.name]: e.target.value });
+        if (e.target.name == 'task_type') {
+            setCurrentTask({ ...currentTask, taskType: e.target.value });
+        } else if (e.target.name == 'assign_to') {
+            setCurrentTask({ ...currentTask, assignTo: e.target.value });
+        } else {
+            setCurrentTask({ ...currentTask, [e.target.name]: e.target.value });
+        }
     };
 
     useEffect(() => {
@@ -150,6 +143,11 @@ const TaskManagement = () => {
             console.log('Invalid date:', date);
         }
     };
+
+    console.log('====================================');
+    console.log(tasks);
+    console.log('====================================');
+    console.log(users);
 
     return (
         <div>
@@ -218,19 +216,14 @@ const TaskManagement = () => {
                         <Form.Group>
                             <Form.Label>Type</Form.Label>
                             <Form.Control as="select" name="task_type" value={currentTask.taskType || ''} onChange={handleChange}>
-                                <option value="TASK">Task</option>
-                                <option value="BUG">Bug</option>
-                                <option value="FEATURE">Feature</option>
+                                <option value="TASK">TASK</option>
+                                <option value="BUG">BUG</option>
+                                <option value="FEATURE">FEATURE</option>
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Sprint</Form.Label>
-                            <Form.Control as="select" name="sprint" value={currentTask.sprint || ''} onChange={handleChange}>
-                                <option value="">Select Sprint</option>
-                                {sprints.map(sprint => (
-                                    <option key={sprint} value={sprint}>{sprint}</option>
-                                ))}
-                            </Form.Control>
+                            <Form.Control type="text" name="sprint" value={currentTask.sprint || ''} onChange={handleChange} />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Status</Form.Label>
@@ -247,7 +240,7 @@ const TaskManagement = () => {
                             <Form.Control as="select" name="assign_to" value={currentTask.assignTo || ''} onChange={handleChange}>
                                 <option value="">Select User</option>
                                 {users.map(user => (
-                                    <option key={user.id} value={user.id}>{user.userName}</option>
+                                    <option key={user.userId} value={user.userId}>{user.userName}</option>
                                 ))}
                             </Form.Control>
                         </Form.Group>

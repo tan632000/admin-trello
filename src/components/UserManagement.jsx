@@ -24,15 +24,15 @@ const UserManagement = () => {
     const handleClose = () => setShow(false);
 
     const handleSave = () => {
-        if (currentUser.id) {
+        if (currentUser.userId) {
             axios.put(`http://localhost:8080/user`, {
                 UserName: currentUser.userName,
                 Password: currentUser.pass
             }).then(() => {
-                setUsers(users.map(u => (u.id === currentUser.id ? currentUser : u)));
+                setUsers(users.map(u => (u.userId === currentUser.userId ? currentUser : u)));
             });
         } else {
-            axios.post('http://localhost:8080/user', {
+            axios.post('http://localhost:8080/user/web', {
                 UserName: currentUser.userName,
                 Password: currentUser.pass
             }).then(response => {
@@ -42,9 +42,13 @@ const UserManagement = () => {
         setShow(false);
     };
 
-    const handleDelete = (id) => {
-        axios.delete(`http://localhost:8080/user/${id}`).then(() => {
-            setUsers(users.filter(u => u.id !== id));
+    const handleDelete = (userId) => {
+        axios.delete(`http://localhost:8080/user/${userId}`, {
+            params: {
+                UserId: userId
+            }
+        }).then(() => {
+            setUsers(users.filter(u => u.userId !== userId));
         });
     };
 
@@ -66,12 +70,12 @@ const UserManagement = () => {
                 </thead>
                 <tbody>
                     {users.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
+                        <tr key={user.userId}>
+                            <td>{user.userId}</td>
                             <td>{user.userName}</td>
                             <td>
                                 <Button onClick={() => handleShow(user)}>Edit</Button>
-                                <Button variant="danger" onClick={() => handleDelete(user.id)}>Delete</Button>
+                                <Button variant="danger" onClick={() => handleDelete(user.userId)}>Delete</Button>
                             </td>
                         </tr>
                     ))}
@@ -80,7 +84,7 @@ const UserManagement = () => {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{currentUser.id ? 'Edit User' : 'Add User'}</Modal.Title>
+                    <Modal.Title>{currentUser.userId ? 'Edit User' : 'Add User'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
