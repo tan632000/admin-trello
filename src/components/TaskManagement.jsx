@@ -37,7 +37,7 @@ const TaskManagement = () => {
     };
 
     const getUserByName = (userId) => {
-        const user = users.find(u => u.userId === userId);
+        const user = users.find(u => u.userId == userId);
         return user ? user.userName : null;
     };
 
@@ -48,19 +48,20 @@ const TaskManagement = () => {
         if (currentTask.id) {
             axios.put(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
-                    assign_name: userName,
-                    assign_to: currentTask.assignTo,
+                    id: currentTask.id,
+                    assignName: userName,
+                    assignTo: currentTask.assignTo,
                     sprint: currentTask.sprint,
-                    task_type: currentTask.task_type,
+                    taskType: currentTask.taskType,
                     priority: currentTask.priority,
                     desciption: currentTask.desciption,
                     name: currentTask.name,
                     status: currentTask.status,
-                    start_time: currentTask.startTime,
-                    create_time: currentTask.startTime,
-                    end_time: currentTask.endTime,
+                    startTime: currentTask.createTime,
+                    createTime: currentTask.createTime,
+                    endTime: currentTask.endTime,
                     comment: '',
-                    user_id: currentTask.userId,
+                    user_id: 'h31ar6zi-jgVY-nFBVT0ZElmtS8DLGMz',
                 })
             }).then(() => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
@@ -68,17 +69,17 @@ const TaskManagement = () => {
         } else {
             axios.post(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
-                    assign_name: currentTask.assign_to,
-                    assign_to: currentTask.assignTo,
+                    assignName: userName,
+                    assignTo: currentTask.assignTo,
                     sprint: currentTask.sprint,
-                    task_type: currentTask.task_type,
+                    taskType: currentTask.taskType,
                     priority: currentTask.priority,
                     desciption: currentTask.desciption,
                     name: currentTask.name,
                     status: currentTask.status,
-                    start_time: currentTask.startTime,
-                    create_time: currentTask.startTime,
-                    end_time: currentTask.endTime,
+                    startTime: currentTask.createTime,
+                    createTime: currentTask.createTime,
+                    endTime: currentTask.endTime,
                     comment: '',
                     user_id: 'h31ar6zi-jgVY-nFBVT0ZElmtS8DLGMz',
                 })
