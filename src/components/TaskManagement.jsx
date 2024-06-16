@@ -14,7 +14,7 @@ const TaskManagement = () => {
     const [endDate, setEndDate] = useState(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/tasks').then(response => {
+        axios.get('http://34.142.249.60/tasks').then(response => {
             setTasks(response.data);
         })
             .catch(error => {
@@ -23,7 +23,7 @@ const TaskManagement = () => {
     }, []);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/user/get-list').then(response => {
+        axios.get('http://34.142.249.60/user/get-list').then(response => {
             setUsers(response.data);
         })
             .catch(error => {
@@ -46,7 +46,7 @@ const TaskManagement = () => {
     const handleSave = () => {
         const userName = getUserByName(currentTask.assignTo);
         if (currentTask.id) {
-            axios.put(`http://localhost:8080/task`, {
+            axios.put(`http://34.142.249.60/task`, {
                 Data: JSON.stringify({
                     id: currentTask.id,
                     assignName: userName,
@@ -61,13 +61,13 @@ const TaskManagement = () => {
                     createTime: currentTask.createTime,
                     endTime: currentTask.endTime,
                     comment: '',
-                    user_id: 'h31ar6zi-jgVY-nFBVT0ZElmtS8DLGMz',
+                    user_id: localStorage.getItem('userId'),
                 })
             }).then(() => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
             });
         } else {
-            axios.post(`http://localhost:8080/task`, {
+            axios.post(`http://34.142.249.60/task`, {
                 Data: JSON.stringify({
                     assignName: userName,
                     assignTo: currentTask.assignTo,
@@ -81,7 +81,7 @@ const TaskManagement = () => {
                     createTime: currentTask.createTime,
                     endTime: currentTask.endTime,
                     comment: '',
-                    user_id: 'h31ar6zi-jgVY-nFBVT0ZElmtS8DLGMz',
+                    user_id: localStorage.getItem('userId'),
                 })
             }).then(() => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
@@ -91,7 +91,7 @@ const TaskManagement = () => {
     };
 
     const handleDelete = (taskId) => {
-        axios.delete(`http://localhost:8080/task/${taskId}`).then(() => {
+        axios.delete(`http://34.142.249.60/task/${taskId}`).then(() => {
             setTasks(tasks.filter(t => t.id !== taskId));
         });
     };

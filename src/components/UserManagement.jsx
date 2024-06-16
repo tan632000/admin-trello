@@ -8,7 +8,7 @@ const UserManagement = () => {
     const [currentUser, setCurrentUser] = useState({});
 
     useEffect(() => {
-        axios.get('http://localhost:8080/user/get-list').then(response => {
+        axios.get('http://34.142.249.60/user/get-list').then(response => {
             setUsers(response.data);
         })
             .catch(error => {
@@ -25,14 +25,14 @@ const UserManagement = () => {
 
     const handleSave = () => {
         if (currentUser.userId) {
-            axios.put(`http://localhost:8080/user`, {
+            axios.put(`http://34.142.249.60/user`, {
                 UserName: currentUser.userName,
                 Password: currentUser.pass
             }).then(() => {
                 setUsers(users.map(u => (u.userId === currentUser.userId ? currentUser : u)));
             });
         } else {
-            axios.post('http://localhost:8080/user/web', {
+            axios.post('http://34.142.249.60/user/web', {
                 UserName: currentUser.userName,
                 Password: currentUser.pass
             }).then(response => {
@@ -43,7 +43,7 @@ const UserManagement = () => {
     };
 
     const handleDelete = (userId) => {
-        axios.delete(`http://localhost:8080/user/${userId}`, {
+        axios.delete(`http://34.142.249.60/user/${userId}`, {
             params: {
                 UserId: userId
             }

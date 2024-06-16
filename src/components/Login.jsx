@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../Login.css'; // Import CSS file for styling
+import '../Login.css';
 
-const Login = () => {
+const Login = ({ onLogin }) => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const isLogged = localStorage.getItem('is_admin');
-        if (isLogged) {
+        if (localStorage.getItem('is_admin') === 'true') {
             navigate('/dashboard');
         }
-    }, [navigate]);
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -24,20 +23,20 @@ const Login = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/admin/login', {
+            const response = await axios.post('http://34.142.249.60/admin/login', {
                 username,
                 password
             });
 
             const data = response.data;
             if (data && data.userId && data.userId.Role === 'admin') {
-                localStorage.setItem('userId', data.userId);
-                localStorage.setItem('is_admin', true);
+                localStorage.setItem('userId', data.userId.userId);
+                localStorage.setItem('is_admin', 'true');
+                onLogin();
                 navigate('/dashboard');
             } else {
                 setError('Login failed. Please check your credentials.');
             }
-
         } catch (error) {
             console.error('Login failed:', error.message);
             setError('Login failed. Please check your credentials.');

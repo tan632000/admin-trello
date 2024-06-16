@@ -29,7 +29,7 @@ const App = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     localStorage.removeItem('is_admin');
-    localStorage.removeItem('user_id');
+    localStorage.removeItem('userId');
   };
 
   return (
