@@ -9,7 +9,7 @@ const TaskCompletionChart = () => {
     const [userData, setUserData] = useState([]);
 
     useEffect(() => {
-        axios.get('http://34.142.249.60/tasks').then(response => {
+        axios.get('http://localhost:8080/tasks').then(response => {
             setTasks(response.data);
         })
             .catch(error => {

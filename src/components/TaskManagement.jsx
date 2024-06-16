@@ -1,35 +1,53 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import axios from 'axios';
+import { Table, Button, Modal, Form, Pagination, InputGroup, FormControl } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import moment from 'moment';
 
 const TaskManagement = () => {
     const [tasks, setTasks] = useState([]);
+    const [filteredTasks, setFilteredTasks] = useState([]);
     const [users, setUsers] = useState([]);
     const [show, setShow] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [recordsPerPage] = useState(10);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
-        axios.get('http://34.142.249.60/tasks').then(response => {
+        axios.get('http://localhost:8080/tasks').then(response => {
             setTasks(response.data);
-        })
-            .catch(error => {
-                console.error('There was an error fetching the user list!', error);
-            });
+            setFilteredTasks(response.data);
+        }).catch(error => {
+            console.error('There was an error fetching the task list!', error);
+        });
     }, []);
 
     useEffect(() => {
-        axios.get('http://34.142.249.60/user/get-list').then(response => {
+        axios.get('http://localhost:8080/user/get-list').then(response => {
             setUsers(response.data);
-        })
-            .catch(error => {
-                console.error('There was an error fetching the user list!', error);
-            });
+        }).catch(error => {
+            console.error('There was an error fetching the user list!', error);
+        });
     }, []);
+
+    useEffect(() => {
+        const filtered = tasks.filter(task =>
+            task.name.toLowerCase().includes(search.toLowerCase()) ||
+            task.desciption.toLowerCase().includes(search.toLowerCase()) ||
+            task.taskType.toLowerCase().includes(search.toLowerCase()) ||
+            (getUserByName(task.assignTo) && getUserByName(task.assignTo).toLowerCase().includes(search.toLowerCase()))
+        );
+        setFilteredTasks(filtered);
+        setCurrentPage(1);
+    }, [search, tasks, users]);
+
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+    };
 
     const handleShow = (task) => {
         setCurrentTask(task);
@@ -38,7 +56,7 @@ const TaskManagement = () => {
 
     const getUserByName = (userId) => {
         const user = users.find(u => u.userId == userId);
-        return user ? user.userName : null;
+        return user ? user.userName : '';
     };
 
     const handleClose = () => setShow(false);
@@ -46,7 +64,7 @@ const TaskManagement = () => {
     const handleSave = () => {
         const userName = getUserByName(currentTask.assignTo);
         if (currentTask.id) {
-            axios.put(`http://34.142.249.60/task`, {
+            axios.put(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
                     id: currentTask.id,
                     assignName: userName,
@@ -67,7 +85,7 @@ const TaskManagement = () => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
             });
         } else {
-            axios.post(`http://34.142.249.60/task`, {
+            axios.post(`http://localhost:8080/task`, {
                 Data: JSON.stringify({
                     assignName: userName,
                     assignTo: currentTask.assignTo,
@@ -91,7 +109,7 @@ const TaskManagement = () => {
     };
 
     const handleDelete = (taskId) => {
-        axios.delete(`http://34.142.249.60/task/${taskId}`).then(() => {
+        axios.delete(`http://localhost:8080/task/${taskId}`).then(() => {
             setTasks(tasks.filter(t => t.id !== taskId));
         });
     };
@@ -145,19 +163,26 @@ const TaskManagement = () => {
         }
     };
 
-    console.log('====================================');
-    console.log(tasks);
-    console.log('====================================');
-    console.log(users);
+    const pageCount = Math.ceil(filteredTasks.length / recordsPerPage);
+    const indexOfLastRecord = currentPage * recordsPerPage;
+    const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+    const currentTasks = filteredTasks.slice(indexOfFirstRecord, indexOfLastRecord);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div>
             <h2>Task Management</h2>
-            <Button onClick={() => handleShow({})}>Add Task</Button>
+            <InputGroup className="mb-3">
+                <FormControl
+                    placeholder="Search by task title, description, sprint, assigned to..."
+                    onChange={handleSearchChange}
+                />
+                <Button onClick={() => handleShow({})}>Add Task</Button>
+            </InputGroup>
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>#</th>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Priority</th>
@@ -171,16 +196,15 @@ const TaskManagement = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map(task => (
-                        <tr key={task.id}>
-                            <td>{task.id}</td>
+                    {currentTasks.map((task, index) => (
+                        <tr key={index}>
                             <td>{task.name}</td>
                             <td>{task.desciption}</td>
                             <td>{task.priority}</td>
                             <td>{task.taskType}</td>
                             <td>{task.sprint}</td>
                             <td>{task.status}</td>
-                            <td>{task.assignName}</td>
+                            <td>{getUserByName(task.assignTo)}</td>
                             <td>{task.createTime}</td>
                             <td>{task.endTime}</td>
                             <td>
@@ -191,7 +215,13 @@ const TaskManagement = () => {
                     ))}
                 </tbody>
             </Table>
-
+            <Pagination>
+                {[...Array(pageCount).keys()].map(number => (
+                    <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => paginate(number + 1)}>
+                        {number + 1}
+                    </Pagination.Item>
+                ))}
+            </Pagination>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>{currentTask.id ? 'Edit Task' : 'Add Task'}</Modal.Title>

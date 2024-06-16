@@ -23,7 +23,7 @@ const Login = ({ onLogin }) => {
         }
 
         try {
-            const response = await axios.post('http://34.142.249.60/admin/login', {
+            const response = await axios.post('http://localhost:8080/admin/login', {
                 username,
                 password
             });
