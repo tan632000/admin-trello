@@ -92,7 +92,6 @@ const UserManagement = () => {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>#</th>
                         <th>Name</th>
                         <th>Actions</th>
                     </tr>
@@ -100,7 +99,6 @@ const UserManagement = () => {
                 <tbody>
                     {currentUsers.map((user, index) => (
                         <tr key={index}>
-                            <td>{index + 1 + indexOfFirstRecord}</td>
                             <td>{user.userName}</td>
                             <td>
                                 <Button onClick={() => handleShow(user)}>Edit</Button>
