@@ -35,11 +35,17 @@ const TaskManagement = () => {
     }, []);
 
     useEffect(() => {
+        const searchStr = search.toString().toLowerCase();
         const filtered = tasks.filter(task =>
-            task.name.toLowerCase().includes(search.toLowerCase()) ||
-            task.desciption.toLowerCase().includes(search.toLowerCase()) ||
-            task.taskType.toLowerCase().includes(search.toLowerCase()) ||
-            (getUserByName(task.assignTo) && getUserByName(task.assignTo).toLowerCase().includes(search.toLowerCase()))
+            task.name.toLowerCase().includes(searchStr) ||
+            task.desciption.toLowerCase().includes(searchStr) ||
+            task.taskType.toLowerCase().includes(searchStr) ||
+            task.priority.toLowerCase().includes(searchStr) ||
+            task.sprint.toLowerCase().includes(searchStr) ||
+            task.status.toLowerCase().includes(searchStr) ||
+            (task.createTime && task.createTime.includes(searchStr)) ||
+            (task.endTime && task.endTime.includes(searchStr)) ||
+            (getUserByName(task.assignTo) && getUserByName(task.assignTo).toLowerCase().includes(searchStr))
         );
         setFilteredTasks(filtered);
         setCurrentPage(1);
