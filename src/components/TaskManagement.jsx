@@ -76,16 +76,16 @@ const TaskManagement = () => {
                     assignName: userName,
                     assignTo: currentTask.assignTo,
                     sprint: currentTask.sprint,
-                    taskType: currentTask.taskType,
-                    priority: currentTask.priority,
+                    taskType: currentTask.taskType || 'TASK',
+                    priority: currentTask.priority || 'LOW',
                     desciption: currentTask.desciption,
                     name: currentTask.name,
-                    status: currentTask.status,
+                    status: currentTask.status || 'TODO',
                     startTime: currentTask.createTime,
                     createTime: currentTask.createTime,
                     endTime: currentTask.endTime,
                     comment: '',
-                    user_id: localStorage.getItem('userId'),
+                    userId: currentTask.assignTo,
                 })
             }).then(() => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
@@ -96,16 +96,16 @@ const TaskManagement = () => {
                     assignName: userName,
                     assignTo: currentTask.assignTo,
                     sprint: currentTask.sprint,
-                    taskType: currentTask.taskType,
-                    priority: currentTask.priority,
+                    taskType: currentTask.taskType || 'TASK',
+                    priority: currentTask.priority || 'LOW',
                     desciption: currentTask.desciption,
                     name: currentTask.name,
-                    status: currentTask.status,
+                    status: currentTask.status || 'TODO',
                     startTime: currentTask.createTime,
                     createTime: currentTask.createTime,
                     endTime: currentTask.endTime,
                     comment: '',
-                    user_id: localStorage.getItem('userId'),
+                    userId: currentTask.assignTo,
                 })
             }).then(() => {
                 setTasks(tasks.map(u => (u.id === currentTask.id ? currentTask : u)));
@@ -255,7 +255,7 @@ const TaskManagement = () => {
                             <Form.Control as="select" name="task_type" value={currentTask.taskType || ''} onChange={handleChange}>
                                 <option value="TASK">TASK</option>
                                 <option value="BUG">BUG</option>
-                                <option value="FEATURE">FEATURE</option>
+                                <option value="STORY">STORY</option>
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
@@ -270,6 +270,7 @@ const TaskManagement = () => {
                                 <option value="REOPEN">REOPEN</option>
                                 <option value="IN REVIEW">IN REVIEW</option>
                                 <option value="IN PROGRESS">IN PROGRESS</option>
+                                <option value="CLOSE">CLOSE</option>
                             </Form.Control>
                         </Form.Group>
                         <Form.Group>
